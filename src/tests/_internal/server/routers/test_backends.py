@@ -35,6 +35,7 @@ class TestListBackendTypes:
             "nebius",
             "tensordock",
             "vastai",
+            "cudocompute",
         ]
 
 

@@ -102,9 +102,11 @@ DATACRUNCH_DEPS = ["datacrunch"]
 
 KUBERNETES_DEPS = ["kubernetes"]
 
+CUDOCOMPUTE_DEPS = ["cudo_compute"]
+
 LAMBDA_DEPS = AWS_DEPS
 
-ALL_DEPS = AWS_DEPS + AZURE_DEPS + GCP_DEPS + DATACRUNCH_DEPS + KUBERNETES_DEPS
+ALL_DEPS = AWS_DEPS + AZURE_DEPS + GCP_DEPS + DATACRUNCH_DEPS + KUBERNETES_DEPS + CUDOCOMPUTE_DEPS
 
 
 setup(
@@ -139,6 +141,7 @@ setup(
         "gcp": GCP_DEPS,
         "kubernetes": KUBERNETES_DEPS,
         "lambda": LAMBDA_DEPS,
+        "cudocompute": CUDOCOMPUTE_DEPS,
     },
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",

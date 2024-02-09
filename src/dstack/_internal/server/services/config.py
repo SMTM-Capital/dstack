@@ -40,6 +40,13 @@ class AzureConfig(ForbidExtra):
     creds: AnyAzureCreds = Field(..., discriminator="type")
 
 
+class CudoComputeConfig(ForbidExtra):
+    type: Literal["cudocompute"] = "cudocompute"
+    regions: Optional[List[str]] = None
+    creds: AnyDataCrunchCreds
+    project_id: str
+
+
 class DataCrunchConfig(ForbidExtra):
     type: Literal["datacrunch"] = "datacrunch"
     regions: Optional[List[str]] = None
@@ -141,6 +148,7 @@ AnyBackendConfig = Union[
     TensorDockConfig,
     VastAIConfig,
     DstackConfig,
+    CudoComputeConfig,
 ]
 
 
