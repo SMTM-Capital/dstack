@@ -1,0 +1,11 @@
+type: dev-environment
+
+# Use either `python` or `image` to configure environment
+python: "3.11"
+# image: ghcr.io/huggingface/text-generation-inference:latest
+
+ide: vscode
+
+# (Optional) Configure `gpu`, `memory`, `disk`, etc
+resources:
+  gpu: 80GB

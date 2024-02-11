@@ -91,3 +91,18 @@ class CudoComputeCompute(Compute):
         self, instance_id: str, region: str, backend_data: Optional[str] = None
     ):
         self.api_client.terminate_virtual_machine(instance_id, self.config.project_id)
+
+
+if __name__ == "__main__":
+    commands = get_shim_commands(
+        backend=BackendType.CUDOCOMPUTE,
+        image_name="IMAGE_NAME",
+        authorized_keys=[
+            "SSH_PUBLIC_KEY",
+            "PROJECT_SSH_PUBLIC_KEY",
+        ],
+        registry_auth_required=None,
+    )
+
+    startup_script = " ".join([" && ".join(commands)])
+    print(startup_script)

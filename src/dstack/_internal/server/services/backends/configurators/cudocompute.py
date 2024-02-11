@@ -9,7 +9,11 @@ from dstack._internal.core.models.backends import (
     CudoComputeConfigInfoWithCredsPartial,
     CudoComputeConfigValues,
 )
-from dstack._internal.core.models.backends.base import ConfigElementValue, ConfigMultiElement
+from dstack._internal.core.models.backends.base import (
+    BackendType,
+    ConfigElementValue,
+    ConfigMultiElement,
+)
 from dstack._internal.core.models.backends.cudocompute import (
     CudoComputeCreds,
     CudoComputeStoredConfig,
@@ -30,6 +34,8 @@ DEFAULT_REGION = "no-luster-1"
 
 
 class CudoComputeConfigurator(Configurator):
+    TYPE: BackendType = BackendType.CUDOCOMPUTE
+
     def get_default_configs(self) -> List[CudoComputeConfigInfoWithCreds]:
         return []
 
