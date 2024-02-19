@@ -24,6 +24,9 @@ def get_catalog_offers(
     provider = backend.value
     if backend == BackendType.LAMBDA:
         provider = "lambdalabs"
+    # if backend == BackendType.CUDOCOMPUTE:
+    #     #Todo update disk size, change to 1GB
+    print(requirements.resources.disk)
     q = requirements_to_query_filter(requirements)
     q.provider = [provider]
     offers = []
@@ -35,6 +38,8 @@ def get_catalog_offers(
         if extra_filter is not None and not extra_filter(offer):
             continue
         offers.append(offer)
+    # if backend == BackendType.CUDOCOMPUTE:
+    #     # Todo Add the price of extra GBs in disk
     return offers
 
 

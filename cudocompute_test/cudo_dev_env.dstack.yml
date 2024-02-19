@@ -8,4 +8,6 @@ ide: vscode
 
 # (Optional) Configure `gpu`, `memory`, `disk`, etc
 resources:
-  gpu: 80GB
+  memory: 2GB
+  disk: 10GB
+  gpu: 2

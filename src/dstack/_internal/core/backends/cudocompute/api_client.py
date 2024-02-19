@@ -26,6 +26,7 @@ class CudoComputeApiClient:
         password: str,
         vcpus: int,
         vm_id: str,
+        customSshKeys,
         start_script: str = None,
     ):
         data = {
@@ -44,6 +45,7 @@ class CudoComputeApiClient:
             "vcpus": vcpus,
             "vmId": vm_id,
             "startScript": start_script,
+            "customSshKeys": customSshKeys,
         }
         resp = self._make_request("POST", f"/projects/{project_id}/vm", data)
         if resp.ok:
@@ -91,7 +93,7 @@ class CudoComputeApiClient:
             return resp.json()["id"]
         resp.raise_for_status()
 
-    def list_vms(self, project_id, vm_id):
+    def get_vm(self, project_id, vm_id):
         resp = self._make_request("GET", f"/projects/{project_id}/vms/{vm_id}")
         if resp.ok:
             return resp.json()
