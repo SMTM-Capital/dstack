@@ -2,6 +2,7 @@ from dataclasses import asdict
 from typing import Callable, List, Optional
 
 import gpuhunt
+from dstack._internal.core.backends.cudocompute.utils import get_cudo_pricing
 
 from dstack._internal.core.models.backends.base import BackendType
 from dstack._internal.core.models.instances import (
@@ -24,9 +25,14 @@ def get_catalog_offers(
     provider = backend.value
     if backend == BackendType.LAMBDA:
         provider = "lambdalabs"
-    # if backend == BackendType.CUDOCOMPUTE:
-    #     #Todo update disk size, change to 1GB
-    print(requirements.resources.disk)
+    elif backend == BackendType.CUDOCOMPUTE:
+        provider = "cudocompute"
+        if requirements is not None and requirements.resources.disk is not None:
+            disk_size_min = requirements.resources.disk.size.min
+            disk_size_max = requirements.resources.disk.size.max
+            requirements.resources.disk.size.min = 1
+            requirements.resources.disk.size.max = 1
+
     q = requirements_to_query_filter(requirements)
     q.provider = [provider]
     offers = []
@@ -34,12 +40,12 @@ def get_catalog_offers(
     for item in catalog.query(**asdict(q)):
         if locations is not None and item.location not in locations:
             continue
+        if backend == BackendType.CUDOCOMPUTE and requirements.resources.disk is not None:
+            item.disk_size = disk_size_max
         offer = catalog_item_to_offer(backend, item, requirements)
         if extra_filter is not None and not extra_filter(offer):
             continue
         offers.append(offer)
-    # if backend == BackendType.CUDOCOMPUTE:
-    #     # Todo Add the price of extra GBs in disk
     return offers
 
 
@@ -56,23 +62,51 @@ def catalog_item_to_offer(
         if requirements and requirements.resources.disk
         else 102400  # TODO: Make requirements' fields required
     )
-    resources = Resources(
-        cpus=item.cpu,
-        memory_mib=round(item.memory * 1024),
-        gpus=gpus,
-        spot=item.spot,
-        disk=Disk(size_mib=disk_size_mib),
-    )
-    resources.description = resources.pretty_format()
-    return InstanceOffer(
-        backend=backend,
-        instance=InstanceType(
-            name=item.instance_name,
-            resources=resources,
-        ),
-        region=item.location,
-        price=item.price,
-    )
+    if backend == BackendType.CUDOCOMPUTE:
+        if requirements.resources.disk is not None:
+            updated_price = get_cudo_pricing(item.price, item.disk_size)
+            disk_size_mib = round(
+                item.disk_size * requirements.resources.disk.size.min * 1024
+                if item.disk_size
+                else requirements.resources.disk.size.min * 1024
+                if requirements and requirements.resources.disk
+                else 102400  # TODO: Make requirements' fields required
+            )
+        else:
+            updated_price=item.price
+
+        resources = Resources(
+            cpus=item.cpu,
+            memory_mib=round(item.memory * 1024),
+            gpus=gpus,
+            spot=item.spot,
+            disk=Disk(size_mib=disk_size_mib),
+        )
+        resources.description = resources.pretty_format()
+        return InstanceOffer(
+            backend=backend,
+            instance=InstanceType(name=item.instance_name, resources=resources),
+            region=item.location,
+            price=updated_price,
+        )
+    else:
+        resources = Resources(
+            cpus=item.cpu,
+            memory_mib=round(item.memory * 1024),
+            gpus=gpus,
+            spot=item.spot,
+            disk=Disk(size_mib=disk_size_mib),
+        )
+        resources.description = resources.pretty_format()
+        return InstanceOffer(
+            backend=backend,
+            instance=InstanceType(
+                name=item.instance_name,
+                resources=resources,
+            ),
+            region=item.location,
+            price=item.price,
+        )
 
 
 def offer_to_catalog_item(offer: InstanceOffer) -> gpuhunt.CatalogItem:
