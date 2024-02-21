@@ -101,7 +101,7 @@ DATACRUNCH_DEPS = ["datacrunch"]
 
 KUBERNETES_DEPS = ["kubernetes"]
 
-CUDOCOMPUTE_DEPS = ["cudo_compute"]
+CUDOCOMPUTE_DEPS = []
 
 LAMBDA_DEPS = AWS_DEPS
 
